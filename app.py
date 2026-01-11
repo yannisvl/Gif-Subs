@@ -142,10 +142,13 @@ if query and embeddings is not None:
             with col1:
                 # NEW: Editable Text Input instead of static text
                 # We use the found text as the default value.
+                # NOTE: Streamlit widgets keep state by key. Using the loop index
+                # can cause stale values when the result order changes on new searches.
+                caption_key = f"caption_{hit['corpus_id']}"
                 custom_caption = st.text_input(
                     label="Caption", 
                     value=data['text'], 
-                    key=f"caption_{i}", 
+                    key=caption_key,
                     label_visibility="collapsed"
                 )
                 st.caption(f"Confidence: {int(score*100)}% | Time: {data['start']}")
@@ -156,7 +159,7 @@ if query and embeddings is not None:
                 st.link_button("▶ Watch", url)
             
             with col3:
-                if st.button("🎞️ GIF", key=f"gif_btn_{i}"):
+                if st.button("🎞️ GIF", key=f"gif_btn_{hit['corpus_id']}"):
                     with st.spinner("Creating..."):
                         # We pass 'custom_caption' (what you typed) instead of data['text']
                         gif_path = create_gif_snippet(data['video_id'], seconds, custom_caption)
